@@ -23,6 +23,8 @@ Our tests confirm that:
 | 8u372/8u382 | 0.5/1 | 256m/512m | 1 | ~123 MB | Yes |
 | 8u372/8u382 | 2 | 1g | 2 | ~247 MB | Yes |
 
+**Note on Container Support**: While JDK 8u372+ correctly detects container limits (marked as "Yes" above), none of the tested JDK versions expose explicit container-related system properties through the standard Java API. The "Container Support" column indicates whether the JVM correctly respects container limits, not whether it exposes container-specific properties.
+
 For detailed findings, see [results/findings.md](results/findings.md).
 
 ## Repository Structure
