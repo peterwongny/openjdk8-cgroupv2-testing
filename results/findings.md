@@ -14,12 +14,12 @@ This document summarizes the findings from testing OpenJDK 8's compatibility wit
 | 8u362 | 0.5 | 256m | 8 | 1.7 GB | No |
 | 8u362 | 1 | 512m | 8 | 1.7 GB | No |
 | 8u362 | 2 | 1g | 8 | 1.7 GB | No |
-| 8u372 | 0.5 | 256m | 1 | 121.8 MB | No |
-| 8u372 | 1 | 512m | 1 | 123.8 MB | No |
-| 8u372 | 2 | 1g | 2 | 247.5 MB | No |
-| 8u382 | 0.5 | 256m | 1 | 121.8 MB | No |
-| 8u382 | 1 | 512m | 1 | 123.8 MB | No |
-| 8u382 | 2 | 1g | 2 | 247.5 MB | No |
+| 8u372 | 0.5 | 256m | 1 | 121.8 MB | Yes |
+| 8u372 | 1 | 512m | 1 | 123.8 MB | Yes |
+| 8u372 | 2 | 1g | 2 | 247.5 MB | Yes |
+| 8u382 | 0.5 | 256m | 1 | 121.8 MB | Yes |
+| 8u382 | 1 | 512m | 1 | 123.8 MB | Yes |
+| 8u382 | 2 | 1g | 2 | 247.5 MB | Yes |
 
 ## Docker Test Results with Explicit Flags
 
@@ -27,23 +27,23 @@ This document summarizes the findings from testing OpenJDK 8's compatibility wit
 |------------|-----------|-------------|--------------|----------------|-------------------|
 | 8u342 | 1 | 512m | 8 | 1.7 GB | No |
 | 8u362 | 1 | 512m | 8 | 1.7 GB | No |
-| 8u372 | 1 | 512m | 1 | 123.8 MB | No |
-| 8u382 | 1 | 512m | 1 | 123.8 MB | No |
+| 8u372 | 1 | 512m | 1 | 123.8 MB | Yes |
+| 8u382 | 1 | 512m | 1 | 123.8 MB | Yes |
 
 ## Simulated EKS Test Results
 
 | JDK Version | Detected CPUs | Detected Memory | Container Support |
 |------------|--------------|----------------|-------------------|
 | 8u362 | 8 | 1.7 GB | No |
-| 8u372 | 1 | 123.8 MB | No |
-| 8u382 | 1 | 123.8 MB | No |
+| 8u372 | 1 | 123.8 MB | Yes |
+| 8u382 | 1 | 123.8 MB | Yes |
 
 ### With Explicit Container Support Flags
 
 | JDK Version | Detected CPUs | Detected Memory | Container Support |
 |------------|--------------|----------------|-------------------|
 | 8u362 (explicit flags) | 8 | 1.7 GB | No |
-| 8u372 (explicit flags) | 1 | 123.8 MB | No |
+| 8u372 (explicit flags) | 1 | 123.8 MB | Yes |
 
 ## Analysis
 
@@ -76,7 +76,10 @@ The difference between the memory limit (e.g., 1g or 1024MB) and the detected me
 
 ### Container Support Flags
 
-Interestingly, none of the JDK versions explicitly show container-related system properties in the output, even though the `UseContainerSupport` flag is set to `true` in all versions. This suggests that while the flag is enabled, the actual implementation of container support varies between versions.
+While the `UseContainerSupport` flag is set to `true` in all versions, the actual implementation of container support varies between versions:
+
+- In JDK 8u362 and earlier: The flag is present but the implementation doesn't properly support cgroup v2
+- In JDK 8u372 and newer: The flag is present and the implementation correctly supports cgroup v2
 
 ### Effect of Explicit Flags
 
