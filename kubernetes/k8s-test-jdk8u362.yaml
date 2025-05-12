@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jdk8u362-cgroup-test
+spec:
+  template:
+    spec:
+      containers:
+      - name: jdk-test
+        image: amazoncorretto:8u362
+        command: ["sh", "-c"]
+        args:
+        - |
+          cat > ResourceDetectionTest.java << 'EOF'
+          public class ResourceDetectionTest {
+              public static void main(String[] args) {
+                  System.out.println("Java Version: " + System.getProperty("java.version"));
+                  System.out.println("Java VM Name: " + System.getProperty("java.vm.name"));
+                  System.out.println("Java VM Version: " + System.getProperty("java.vm.version"));
+                  
+                  System.out.println("\n=== CPU Resources ===");
+                  System.out.println("Available processors: " + Runtime.getRuntime().availableProcessors());
+                  
+                  System.out.println("\n=== Memory Resources ===");
+                  System.out.println("Max memory: " + Runtime.getRuntime().maxMemory() / (1024*1024) + " MB");
+                  System.out.println("Total memory: " + Runtime.getRuntime().totalMemory() / (1024*1024) + " MB");
+                  System.out.println("Free memory: " + Runtime.getRuntime().freeMemory() / (1024*1024) + " MB");
+                  
+                  System.out.println("\n=== System Properties ===");
+                  System.getProperties().forEach((k, v) -> {
+                      if (k.toString().contains("container") || k.toString().contains("cgroup"))
+                          System.out.println(k + ": " + v);
+                  });
+              }
+          }
+          EOF
+          javac ResourceDetectionTest.java
+          java -XX:+PrintFlagsFinal ResourceDetectionTest
+          sleep 10
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+      restartPolicy: Never
+  backoffLimit: 0

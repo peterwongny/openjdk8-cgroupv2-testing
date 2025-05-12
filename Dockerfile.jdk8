@@ -1,0 +1,8 @@
+ARG JDK_VERSION=8u372
+FROM amazoncorretto:${JDK_VERSION}
+
+WORKDIR /app
+COPY src/ResourceDetectionTest.java .
+RUN javac ResourceDetectionTest.java
+
+ENTRYPOINT ["java", "-XX:+PrintFlagsFinal", "ResourceDetectionTest"]
