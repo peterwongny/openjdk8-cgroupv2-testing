@@ -25,6 +25,12 @@ Our tests confirm that:
 
 **Note on Container Support**: While JDK 8u372+ correctly detects container limits (marked as "Yes" above), none of the tested JDK versions expose explicit container-related system properties through the standard Java API. The "Container Support" column indicates whether the JVM correctly respects container limits, not whether it exposes container-specific properties.
 
+For example:
+- In JDK 8u372+, `Runtime.getRuntime().availableProcessors()` correctly returns the container's CPU limit (e.g., 1 CPU when limited to 1 CPU)
+- In JDK 8u362 and earlier, the same method incorrectly returns the host's CPU count (e.g., 8 CPUs even when limited to 1 CPU)
+- However, even in JDK 8u372+, there are no properties like `java.container.cpu` or `java.container.memory` that applications can query via `System.getProperties()` to explicitly determine container limits
+- This means applications can indirectly benefit from container awareness (proper thread pool sizing, memory management) but cannot directly query "am I in a container?" or "what are my container limits?"
+
 For detailed findings, see [results/findings.md](results/findings.md).
 
 ## Repository Structure
